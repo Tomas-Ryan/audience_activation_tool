@@ -8,7 +8,7 @@
 # }
 
 application: my-great-extension {
-  label: "My Great Extension"
+  label: "Audience Activation Tool"
   url: "http://localhost:8080/bundle.js"
   entitlements: {
     local_storage: yes
