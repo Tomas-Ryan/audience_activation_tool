@@ -1,11 +1,13 @@
 connection: "samsung-looker-emea"
 
+label: "Audience Building Tool (test)"
+
 # include all the views
 include: "*.view*"
 # =include: "data_tests.lkml"
 
 # include all the dashboards
-#include: "*.dashboard"
+include: "*.dashboard"
 
 # below section is where each individual market's "explore" is generated
 

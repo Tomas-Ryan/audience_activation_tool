@@ -1,5 +1,5 @@
-- dashboard: audience_builder_test
-  title:  Test Dashboard
+- dashboard: audience_builder_dashboard_test
+  title:  "Dashboard Audience Builder Test"
   layout: newspaper
   preferred_viewer: dashboards-next
   elements:
@@ -11,7 +11,7 @@
     type: single_value
     fields: [ga_sessions.unique_visitors]
     filters:
-      ga_sessions.partition_date: 7 days ago for 7 days
+      ga_sessions.partition_date:   2017-07-26  to  2017-08-03
     sorts: [ga_sessions.unique_visitors desc]
     limit: 500
     query_timezone: America/Los_Angeles
@@ -26,22 +26,12 @@
     conditional_formatting_include_nulls: false
     defaults_version: 1
     listen:
-      Existing Audience (OR): audience_or.audience
-      Existing Audience (AND): audience_and1.audience
-      'Existing Audience (AND) #2': audience_and2.audience
-      'Existing Audience (AND) #3': audience_and3.audience
       Host Name (Site or property a user has visited): hits_page.hostName
       Medium (Type of referral that brought in traffic): trafficSource.medium
       Source (Site that brought in traffic): trafficSource.source
       Page Path: hits_page.pagePath
       Event Category: hits_eventInfo.eventCategory
-      Time on Site (in seconds): totals.timeonsite
-      Product GFO (cd61): ga360_product_hierarchy.dimension61
-      Product Sub Brand (cd62): ga360_product_hierarchy.dimension62
-      Product Need State (cd63): ga360_product_hierarchy.dimension63
-      Product Sub Category (cd64): ga360_product_hierarchy.dimension64
-      Product Segment (cd65): ga360_product_hierarchy.dimension65
-      Product Sub Segment (cd66): ga360_product_hierarchy.dimension66
+      #Time on Site (in seconds): totals.timeonsite
       User Type (includes both by default): ga_sessions.usertype
     row: 0
     col: 0
@@ -54,7 +44,7 @@
     type: single_value
     fields: [ga_sessions.unique_visitors]
     filters:
-      ga_sessions.partition_date: 30 days ago for 30 days
+      ga_sessions.partition_date: 2017-07-03  to  2017-08-03
 
     sorts: [ga_sessions.unique_visitors desc]
     limit: 500
@@ -70,23 +60,12 @@
     conditional_formatting_include_nulls: false
     defaults_version: 1
     listen:
-      Existing Audience (OR): audience_or.audience
-      Existing Audience (AND): audience_and1.audience
-      'Existing Audience (AND) #2': audience_and2.audience
-      'Existing Audience (AND) #3': audience_and3.audience
       Host Name (Site or property a user has visited): hits_page.hostName
-
       Medium (Type of referral that brought in traffic): trafficSource.medium
       Source (Site that brought in traffic): trafficSource.source
       Page Path: hits_page.pagePath
       Event Category: hits_eventInfo.eventCategory
-      Time on Site (in seconds): totals.timeonsite
-      Product GFO (cd61): ga360_product_hierarchy.dimension61
-      Product Sub Brand (cd62): ga360_product_hierarchy.dimension62
-      Product Need State (cd63): ga360_product_hierarchy.dimension63
-      Product Sub Category (cd64): ga360_product_hierarchy.dimension64
-      Product Segment (cd65): ga360_product_hierarchy.dimension65
-      Product Sub Segment (cd66): ga360_product_hierarchy.dimension66
+     # Time on Site (in seconds): totals.timeonsite
       User Type (includes both by default): ga_sessions.usertype
     row: 0
     col: 6
@@ -99,7 +78,7 @@
     type: single_value
     fields: [ga_sessions.unique_visitors]
     filters:
-      ga_sessions.partition_date: 365 days ago for 365 days
+      ga_sessions.partition_date: 2016-08-03  to  2017-08-03
 
     sorts: [ga_sessions.unique_visitors desc]
     limit: 500
@@ -115,23 +94,12 @@
     conditional_formatting_include_nulls: false
     defaults_version: 1
     listen:
-      Existing Audience (OR): audience_or.audience
-      Existing Audience (AND): audience_and1.audience
-      'Existing Audience (AND) #2': audience_and2.audience
-      'Existing Audience (AND) #3': audience_and3.audience
       Host Name (Site or property a user has visited): hits_page.hostName
-
       Medium (Type of referral that brought in traffic): trafficSource.medium
       Source (Site that brought in traffic): trafficSource.source
       Page Path: hits_page.pagePath
       Event Category: hits_eventInfo.eventCategory
-      Time on Site (in seconds): totals.timeonsite
-      Product GFO (cd61): ga360_product_hierarchy.dimension61
-      Product Sub Brand (cd62): ga360_product_hierarchy.dimension62
-      Product Need State (cd63): ga360_product_hierarchy.dimension63
-      Product Sub Category (cd64): ga360_product_hierarchy.dimension64
-      Product Segment (cd65): ga360_product_hierarchy.dimension65
-      Product Sub Segment (cd66): ga360_product_hierarchy.dimension66
+      #Time on Site (in seconds): totals.timeonsite
       User Type (includes both by default): ga_sessions.usertype
     row: 0
     col: 11
@@ -144,7 +112,7 @@
     type: looker_pie
     fields: [ga_sessions.unique_visitors, ga_sessions.usertype]
     filters:
-      ga_sessions.partition_date: 7 days ago for 7 days
+      ga_sessions.partition_date:   2017-07-26  to  2017-08-03
 
     sorts: [ga_sessions.unique_visitors desc]
     limit: 500
@@ -163,23 +131,12 @@
     defaults_version: 1
     series_types: {}
     listen:
-      Existing Audience (OR): audience_or.audience
-      Existing Audience (AND): audience_and1.audience
-      'Existing Audience (AND) #2': audience_and2.audience
-      'Existing Audience (AND) #3': audience_and3.audience
       Host Name (Site or property a user has visited): hits_page.hostName
-
       Medium (Type of referral that brought in traffic): trafficSource.medium
       Source (Site that brought in traffic): trafficSource.source
       Page Path: hits_page.pagePath
       Event Category: hits_eventInfo.eventCategory
-      Time on Site (in seconds): totals.timeonsite
-      Product GFO (cd61): ga360_product_hierarchy.dimension61
-      Product Sub Brand (cd62): ga360_product_hierarchy.dimension62
-      Product Need State (cd63): ga360_product_hierarchy.dimension63
-      Product Sub Category (cd64): ga360_product_hierarchy.dimension64
-      Product Segment (cd65): ga360_product_hierarchy.dimension65
-      Product Sub Segment (cd66): ga360_product_hierarchy.dimension66
+     # Time on Site (in seconds): totals.timeonsite
       User Type (includes both by default): ga_sessions.usertype
     row: 0
     col: 16
@@ -190,10 +147,10 @@
     model: google_analytics_block
     explore: ga_sessions
     type: looker_line
-    fields: [ga_sessions.partition_week, ga_sessions.unique_visitors, totals.timeonsite_average_per_session]
-    fill_fields: [ga_sessions.partition_week]
+    fields: [ga_sessions.partition2_week, ga_sessions.unique_visitors, totals.timeonsite_average_per_session]
+    fill_fields: [ga_sessions.partition2_week]
     filters:
-      ga_sessions.partition_date: 10 weeks ago for 10 weeks
+      ga_sessions.partition_date:   2017-05-24  to  2017-08-03
 
     sorts: [ga_sessions.unique_visitors desc, ga_sessions.partition_week desc]
     limit: 500
@@ -253,23 +210,12 @@
     labelSize: 10pt
     showLegend: true
     listen:
-      Existing Audience (OR): audience_or.audience
-      Existing Audience (AND): audience_and1.audience
-      'Existing Audience (AND) #2': audience_and2.audience
-      'Existing Audience (AND) #3': audience_and3.audience
       Host Name (Site or property a user has visited): hits_page.hostName
-
       Medium (Type of referral that brought in traffic): trafficSource.medium
       Source (Site that brought in traffic): trafficSource.source
       Page Path: hits_page.pagePath
       Event Category: hits_eventInfo.eventCategory
-      Time on Site (in seconds): totals.timeonsite
-      Product GFO (cd61): ga360_product_hierarchy.dimension61
-      Product Sub Brand (cd62): ga360_product_hierarchy.dimension62
-      Product Need State (cd63): ga360_product_hierarchy.dimension63
-      Product Sub Category (cd64): ga360_product_hierarchy.dimension64
-      Product Segment (cd65): ga360_product_hierarchy.dimension65
-      Product Sub Segment (cd66): ga360_product_hierarchy.dimension66
+      #Time on Site (in seconds): totals.timeonsite
       User Type (includes both by default): ga_sessions.usertype
     row: 5
     col: 0
@@ -282,7 +228,7 @@
     type: looker_grid
     fields: [ga_sessions.unique_visitors, hits_page.hostName, totals.timeonsite_average_per_session]
     filters:
-      ga_sessions.partition_date: 7 days ago for 7 days
+      ga_sessions.partition_date:   2017-07-26  to  2017-08-03
 
     sorts: [ga_sessions.unique_visitors desc]
     limit: 500
@@ -313,23 +259,12 @@
     defaults_version: 1
     series_types: {}
     listen:
-      Existing Audience (OR): audience_or.audience
-      Existing Audience (AND): audience_and1.audience
-      'Existing Audience (AND) #2': audience_and2.audience
-      'Existing Audience (AND) #3': audience_and3.audience
       Host Name (Site or property a user has visited): hits_page.hostName
-
       Medium (Type of referral that brought in traffic): trafficSource.medium
       Source (Site that brought in traffic): trafficSource.source
       Page Path: hits_page.pagePath
       Event Category: hits_eventInfo.eventCategory
-      Time on Site (in seconds): totals.timeonsite
-      Product GFO (cd61): ga360_product_hierarchy.dimension61
-      Product Sub Brand (cd62): ga360_product_hierarchy.dimension62
-      Product Need State (cd63): ga360_product_hierarchy.dimension63
-      Product Sub Category (cd64): ga360_product_hierarchy.dimension64
-      Product Segment (cd65): ga360_product_hierarchy.dimension65
-      Product Sub Segment (cd66): ga360_product_hierarchy.dimension66
+    #  Time on Site (in seconds): totals.timeonsite
       User Type (includes both by default): ga_sessions.usertype
     row: 12
     col: 0
@@ -342,7 +277,7 @@
     type: looker_grid
     fields: [ga_sessions.unique_visitors, totals.timeonsite_average_per_session, trafficSource.source]
     filters:
-      ga_sessions.partition_date: 7 days ago for 7 days
+      ga_sessions.partition_date:   2017-07-26  to  2017-08-03
 
     sorts: [ga_sessions.unique_visitors desc]
     limit: 500
@@ -373,23 +308,12 @@
     defaults_version: 1
     series_types: {}
     listen:
-      Existing Audience (OR): audience_or.audience
-      Existing Audience (AND): audience_and1.audience
-      'Existing Audience (AND) #2': audience_and2.audience
-      'Existing Audience (AND) #3': audience_and3.audience
       Host Name (Site or property a user has visited): hits_page.hostName
-
       Medium (Type of referral that brought in traffic): trafficSource.medium
       Source (Site that brought in traffic): trafficSource.source
       Page Path: hits_page.pagePath
       Event Category: hits_eventInfo.eventCategory
-      Time on Site (in seconds): totals.timeonsite
-      Product GFO (cd61): ga360_product_hierarchy.dimension61
-      Product Sub Brand (cd62): ga360_product_hierarchy.dimension62
-      Product Need State (cd63): ga360_product_hierarchy.dimension63
-      Product Sub Category (cd64): ga360_product_hierarchy.dimension64
-      Product Segment (cd65): ga360_product_hierarchy.dimension65
-      Product Sub Segment (cd66): ga360_product_hierarchy.dimension66
+    #  Time on Site (in seconds): totals.timeonsite
       User Type (includes both by default): ga_sessions.usertype
     row: 12
     col: 16
@@ -400,9 +324,9 @@
     model: google_analytics_block
     explore: ga_sessions
     type: looker_grid
-    fields: [ga360_product_hierarchy.dimension63, ga_sessions.unique_visitors, totals.timeonsite_average_per_session]
+    fields: [hits_item.productCategory, ga_sessions.unique_visitors, totals.timeonsite_average_per_session]
     filters:
-      ga_sessions.partition_date: 7 days ago for 7 days
+      ga_sessions.partition_date:   2017-07-26  to  2017-08-03
 
     sorts: [ga_sessions.unique_visitors desc]
     limit: 500
@@ -439,23 +363,13 @@
     defaults_version: 1
     series_types: {}
     listen:
-      Existing Audience (OR): audience_or.audience
-      Existing Audience (AND): audience_and1.audience
-      'Existing Audience (AND) #2': audience_and2.audience
-      'Existing Audience (AND) #3': audience_and3.audience
       Host Name (Site or property a user has visited): hits_page.hostName
 
       Medium (Type of referral that brought in traffic): trafficSource.medium
       Source (Site that brought in traffic): trafficSource.source
       Page Path: hits_page.pagePath
       Event Category: hits_eventInfo.eventCategory
-      Time on Site (in seconds): totals.timeonsite
-      Product GFO (cd61): ga360_product_hierarchy.dimension61
-      Product Sub Brand (cd62): ga360_product_hierarchy.dimension62
-      Product Need State (cd63): ga360_product_hierarchy.dimension63
-      Product Sub Category (cd64): ga360_product_hierarchy.dimension64
-      Product Segment (cd65): ga360_product_hierarchy.dimension65
-      Product Sub Segment (cd66): ga360_product_hierarchy.dimension66
+    #  Time on Site (in seconds): totals.timeonsite
       User Type (includes both by default): ga_sessions.usertype
     row: 12
     col: 8
@@ -469,7 +383,7 @@
     fields: [ga_sessions.unique_visitors, hits.hit_day_of_week]
     fill_fields: [hits.hit_day_of_week]
     filters:
-      ga_sessions.partition_date: 7 days ago for 7 days
+      ga_sessions.partition_date:   2017-07-26  to  2017-08-03
 
     sorts: [ga_sessions.unique_visitors desc]
     limit: 500
@@ -506,23 +420,13 @@
     hide_totals: false
     hide_row_totals: false
     listen:
-      Existing Audience (OR): audience_or.audience
-      Existing Audience (AND): audience_and1.audience
-      'Existing Audience (AND) #2': audience_and2.audience
-      'Existing Audience (AND) #3': audience_and3.audience
       Host Name (Site or property a user has visited): hits_page.hostName
 
       Medium (Type of referral that brought in traffic): trafficSource.medium
       Source (Site that brought in traffic): trafficSource.source
       Page Path: hits_page.pagePath
       Event Category: hits_eventInfo.eventCategory
-      Time on Site (in seconds): totals.timeonsite
-      Product GFO (cd61): ga360_product_hierarchy.dimension61
-      Product Sub Brand (cd62): ga360_product_hierarchy.dimension62
-      Product Need State (cd63): ga360_product_hierarchy.dimension63
-      Product Sub Category (cd64): ga360_product_hierarchy.dimension64
-      Product Segment (cd65): ga360_product_hierarchy.dimension65
-      Product Sub Segment (cd66): ga360_product_hierarchy.dimension66
+    #  Time on Site (in seconds): totals.timeonsite
       User Type (includes both by default): ga_sessions.usertype
     row: 6
     col: 16
@@ -533,25 +437,15 @@
     model: google_analytics_block
     explore: ga_sessions
     type: looker_grid
-    fields: [ga_sessions.unique_visitors, totals.timeonsite_average_per_session, ga360_product_hierarchy.dimension66]
+    fields: [ga_sessions.unique_visitors, totals.timeonsite_average_per_session, hits_item.productName]
     filters:
-      ga_sessions.partition_date: 30 days ago for 30 days
+      ga_sessions.partition_date:   2017-07-03  to  2017-08-03
       hits_page.hostName: ''
       trafficSource.medium: ''
       trafficSource.source: ''
       hits_page.pagePath: ''
       hits_eventInfo.eventCategory: ''
       totals.timeonsite: ''
-      ga360_product_hierarchy.dimension62: ''
-      ga360_product_hierarchy.dimension63: ''
-      ga360_product_hierarchy.dimension64: ''
-      ga360_product_hierarchy.dimension65: ''
-      ga360_product_hierarchy.dimension66: ''
-      ga360_product_hierarchy.dimension61: ''
-      audience_or.audience: ''
-      audience_and1.audience: ''
-      audience_and2.audience: ''
-      audience_and3.audience: ''
     sorts: [ga_sessions.unique_visitors desc]
     limit: 500
     column_limit: 50
@@ -594,58 +488,6 @@
     width: 8
     height: 6
   filters:
-  - name: Existing Audience (OR)
-    title: Existing Audience (OR)
-    type: field_filter
-    default_value: ''
-    allow_multiple_values: true
-    required: false
-    ui_config:
-      type: advanced
-      display: popover
-    model: google_analytics_block
-    explore: ga_sessions
-    listens_to_filters: []
-    field: audience_or.audience
-  - name: Existing Audience (AND)
-    title: Existing Audience (AND)
-    type: field_filter
-    default_value: ''
-    allow_multiple_values: false
-    required: false
-    ui_config:
-      type: advanced
-      display: popover
-    model: google_analytics_block
-    explore: ga_sessions
-    listens_to_filters: []
-    field: audience_and1.audience
-  - name: 'Existing Audience (AND) #2'
-    title: 'Existing Audience (AND) #2'
-    type: field_filter
-    default_value: ''
-    allow_multiple_values: false
-    required: false
-    ui_config:
-      type: advanced
-      display: popover
-    model: google_analytics_block
-    explore: ga_sessions
-    listens_to_filters: []
-    field: audience_and2.audience
-  - name: 'Existing Audience (AND) #3'
-    title: 'Existing Audience (AND) #3'
-    type: field_filter
-    default_value: ''
-    allow_multiple_values: false
-    required: false
-    ui_config:
-      type: advanced
-      display: popover
-    model: google_analytics_block
-    explore: ga_sessions
-    listens_to_filters: []
-    field: audience_and3.audience
   - name: Host Name (Site or property a user has visited)
     title: Host Name (Site or property a user has visited)
     type: field_filter
@@ -766,99 +608,3 @@
     explore: ga_sessions
     listens_to_filters: []
     field: hits_eventInfo.eventCategory
-  - name: Time on Site (in seconds)
-    title: Time on Site (in seconds)
-    type: field_filter
-    default_value: ''
-    allow_multiple_values: true
-    required: false
-    ui_config:
-      type: advanced
-      display: popover
-      options: []
-    model: google_analytics_block
-    explore: ga_sessions
-    listens_to_filters: []
-    field: totals.timeonsite
-  - name: Product GFO (cd61)
-    title: Product GFO (cd61)
-    type: field_filter
-    default_value: ''
-    allow_multiple_values: true
-    required: false
-    ui_config:
-      type: dropdown_menu
-      display: popover
-      options:
-      - Essential Health
-      - Self Care
-      - Skin Health
-    model: google_analytics_block
-    explore: ga_sessions
-    listens_to_filters: []
-    field: ga360_product_hierarchy.dimension61
-  - name: Product Sub Brand (cd62)
-    title: Product Sub Brand (cd62)
-    type: field_filter
-    default_value: ''
-    allow_multiple_values: true
-    required: false
-    ui_config:
-      type: advanced
-      display: popover
-    model: google_analytics_block
-    explore: ga_sessions
-    listens_to_filters: []
-    field: ga360_product_hierarchy.dimension62
-  - name: Product Need State (cd63)
-    title: Product Need State (cd63)
-    type: field_filter
-    default_value: ''
-    allow_multiple_values: true
-    required: false
-    ui_config:
-      type: advanced
-      display: popover
-    model: google_analytics_block
-    explore: ga_sessions
-    listens_to_filters: [Host Name (Site or property a user has visited)]
-    field: ga360_product_hierarchy.dimension63
-  - name: Product Sub Category (cd64)
-    title: Product Sub Category (cd64)
-    type: field_filter
-    default_value: ''
-    allow_multiple_values: true
-    required: false
-    ui_config:
-      type: advanced
-      display: popover
-    model: google_analytics_block
-    explore: ga_sessions
-    listens_to_filters: []
-    field: ga360_product_hierarchy.dimension64
-  - name: Product Segment (cd65)
-    title: Product Segment (cd65)
-    type: field_filter
-    default_value: ''
-    allow_multiple_values: true
-    required: false
-    ui_config:
-      type: advanced
-      display: popover
-    model: google_analytics_block
-    explore: ga_sessions
-    listens_to_filters: []
-    field: ga360_product_hierarchy.dimension65
-  - name: Product Sub Segment (cd66)
-    title: Product Sub Segment (cd66)
-    type: field_filter
-    default_value: ''
-    allow_multiple_values: true
-    required: false
-    ui_config:
-      type: advanced
-      display: popover
-    model: google_analytics_block
-    explore: ga_sessions
-    listens_to_filters: []
-    field: ga360_product_hierarchy.dimension66

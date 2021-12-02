@@ -122,6 +122,15 @@ view: ga_sessions_base {
     sql: TIMESTAMP(PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_TABLE_SUFFIX,r'^\d\d\d\d\d\d\d\d')))  ;;
   }
 
+  dimension_group: partition2 {
+    label: "Visit Start"
+    timeframes: [raw,second,hour,hour_of_day,date,day_of_week,fiscal_quarter,week,month,year,month_name,month_num,week_of_year]
+    type: time
+    # sql: TIMESTAMP_ADD(TIMESTAMP(PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_TABLE_SUFFIX,r'^\d\d\d\d\d\d\d\d'))), INTERVAL (date_diff(current_date(), cast('2017-08-01' as date), day)) DAY )  ;;
+    sql: TIMESTAMP(PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_TABLE_SUFFIX,r'^\d\d\d\d\d\d\d\d'))) ;;
+    drill_fields: [hits_page.hostName]
+  }
+
   dimension: id {
     primary_key: yes
     sql: CONCAT(CAST(${fullVisitorId} AS STRING), '|', COALESCE(CAST(${visitId} AS STRING),''), CAST(PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_TABLE_SUFFIX,r'^\d\d\d\d\d\d\d\d'))   AS STRING)) ;;
@@ -137,6 +146,13 @@ view: ga_sessions_base {
   dimension:  first_time_visitor {
     type: yesno
     sql: ${visitnumber} = 1 ;;
+  }
+
+  dimension:  usertype {
+    group_label: "Visit Number"
+    label: "User Type"
+    type: string
+    sql: case when ${visitnumber} = 1 then 'New Visitor' else 'Returning Visitor' end ;;
   }
 
   dimension: visitnumbertier {
@@ -315,6 +331,11 @@ view: totals_base {
     label: "Time On Site"
     type: sum
     sql: ${TABLE}.timeonsite ;;
+  }
+  dimension: timeonsite {
+    #group_label: "Time on Screen"
+    label: "Time On Site"
+    type: number
   }
   dimension: timeonsite_tier {
     label: "Time On Site Tier"
