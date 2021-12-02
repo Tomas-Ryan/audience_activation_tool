@@ -1,100 +1,202 @@
+explore: ga_sessions_base {
+  persist_for: "1 hour"
+  extension: required
+  view_name: ga_sessions
+  view_label: "Session"
+  join: totals {
+    view_label: "Session"
+    sql: LEFT JOIN UNNEST([${ga_sessions.totals}]) as totals ;;
+    relationship: one_to_one
+  }
+  join: trafficSource {
+    view_label: "Session: Traffic Source"
+    sql: LEFT JOIN UNNEST([${ga_sessions.trafficSource}]) as trafficSource ;;
+    relationship: one_to_one
+  }
+  # join: adwordsClickInfo {
+  #   view_label: "Session: Traffic Source : Adwords"
+  #   sql: LEFT JOIN UNNEST([${trafficSource.adwordsClickInfo}]) as  adwordsClickInfo;;
+  #   relationship: one_to_one
+  # }
+
+  # join: DoubleClickClickInfo {
+  #   view_label: "Session: Traffic Source : DoubleClick"
+  #   sql: LEFT JOIN UNNEST([${trafficSource.DoubleClickClickInfo}]) as  DoubleClickClickInfo;;
+  #   relationship: one_to_one
+  # }
+  join: device {
+    view_label: "Session: Device"
+    sql: LEFT JOIN UNNEST([${ga_sessions.device}]) as device ;;
+    relationship: one_to_one
+  }
+  join: geoNetwork {
+    view_label: "Session: Geo Network"
+    sql: LEFT JOIN UNNEST([${ga_sessions.geoNetwork}]) as geoNetwork ;;
+    relationship: one_to_one
+  }
+  join: hits {
+    view_label: "Session: Hits"
+    sql: LEFT JOIN UNNEST(${ga_sessions.hits}) as hits ;;
+    relationship: one_to_many
+  }
+  join: hits_page {
+    view_label: "Session: Hits: Page"
+    sql: LEFT JOIN UNNEST([${hits.page}]) as hits_page ;;
+    relationship: one_to_one
+  }
+  join: hits_transaction {
+    view_label: "Session: Hits: Transaction"
+    sql: LEFT JOIN UNNEST([${hits.transaction}]) as hits_transaction ;;
+    relationship: one_to_one
+  }
+  join: hits_item {
+    view_label: "Session: Hits: Item"
+    sql: LEFT JOIN UNNEST([${hits.item}]) as hits_item ;;
+    relationship: one_to_one
+  }
+  join: hits_social {
+    view_label: "Session: Hits: Social"
+    sql: LEFT JOIN UNNEST([${hits.social}]) as hits_social ;;
+    relationship: one_to_one
+  }
+  join: hits_publisher {
+    view_label: "Session: Hits: Publisher"
+    sql: LEFT JOIN UNNEST([${hits.publisher}]) as hits_publisher ;;
+    relationship: one_to_one
+  }
+  join: hits_appInfo {
+    view_label: "Session: Hits: App Info"
+    sql: LEFT JOIN UNNEST([${hits.appInfo}]) as hits_appInfo ;;
+    relationship: one_to_one
+  }
+
+  join: hits_eventInfo{
+    view_label: "Session: Hits: Events Info"
+    sql: LEFT JOIN UNNEST([${hits.eventInfo}]) as hits_eventInfo ;;
+    relationship: one_to_one
+  }
+
+  # join: hits_sourcePropertyInfo {
+  #   view_label: "Session: Hits: Property"
+  #   sql: LEFT JOIN UNNEST([hits.sourcePropertyInfo]) as hits_sourcePropertyInfo ;;
+  #   relationship: one_to_one
+  #   required_joins: [hits]
+  # }
+
+  # join: hits_eCommerceAction {
+  #   view_label: "Session: Hits: eCommerce"
+  #   sql: LEFT JOIN UNNEST([hits.eCommerceAction]) as  hits_eCommerceAction;;
+  #   relationship: one_to_one
+  #   required_joins: [hits]
+  # }
+
+  join: hits_customDimensions {
+    view_label: "Session: Hits: Custom Dimensions"
+    sql: LEFT JOIN UNNEST(${hits.customDimensions}) as hits_customDimensions ;;
+    relationship: one_to_many
+  }
+  join: hits_customVariables{
+    view_label: "Session: Hits: Custom Variables"
+    sql: LEFT JOIN UNNEST(${hits.customVariables}) as hits_customVariables ;;
+    relationship: one_to_many
+  }
+  join: first_hit {
+    from: hits
+    sql: LEFT JOIN UNNEST(${ga_sessions.hits}) as first_hit ;;
+    relationship: one_to_one
+    sql_where: ${first_hit.hitNumber} = 1 ;;
+    fields: [first_hit.page]
+  }
+  join: first_page {
+    view_label: "Session: First Page Visited"
+    from: hits_page
+    sql: LEFT JOIN UNNEST([${first_hit.page}]) as first_page ;;
+    relationship: one_to_one
+  }
+}
+
 view: ga_sessions_base {
   extension: required
-
-### Original Dimensions
-
-  dimension_group: partition {
-    label: "Visit Start"
-    timeframes: [raw,second,hour,hour_of_day,date,day_of_week,fiscal_quarter,week,month,year,month_name,month_num,week_of_year]
-    type: time
-    # sql: TIMESTAMP_ADD(TIMESTAMP(PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_TABLE_SUFFIX,r'^\d\d\d\d\d\d\d\d'))), INTERVAL (date_diff(current_date(), cast('2017-08-01' as date), day)) DAY )  ;;
-    sql: TIMESTAMP(PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_TABLE_SUFFIX,r'^\d\d\d\d\d\d\d\d'))) ;;
-    drill_fields: [hits_page.hostName]
+  dimension: partition_date {
+    type: date_time
+    sql: TIMESTAMP(PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_TABLE_SUFFIX,r'^\d\d\d\d\d\d\d\d')))  ;;
   }
 
-  dimension_group: visitStart {
-    label: "Visit Start"
-    type: time
-    datatype: epoch
-    sql: ${TABLE}.visitStarttime ;;
-    timeframes: [raw,time]
-    hidden: yes
+  dimension: id {
+    primary_key: yes
+    sql: CONCAT(CAST(${fullVisitorId} AS STRING), '|', COALESCE(CAST(${visitId} AS STRING),''), CAST(PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_TABLE_SUFFIX,r'^\d\d\d\d\d\d\d\d'))   AS STRING)) ;;
   }
-
-  dimension: visitorId {
-    group_label: "Z"
-    label: "Visitor ID"
-  }
-
-  dimension: visitId {
-    group_label: "ID"
-    label: "Visit ID"
-  }
-  dimension: fullVisitorId {
-    group_label: "ID"
-    label: "Full Visitor ID"
-  }
-
-  dimension: clientId {
-    group_label: "ID"
-    label: "Client ID"
-  }
-
-
-  dimension: socialEngagementType {
-    group_label: "User Information"
-    description: "Not Socially Engaged"
-    label: "Social Engagement Type"
-  }
-  dimension: userid {
-    group_label: "Z"
-    label: "User ID"
-  }
-  dimension: channelGrouping {
-    group_label: "User Information"
-    label: "Channel Grouping"
-    description: "Affiliate, Direct, Display, Organic Search, Paid Search, Referral, Social"
-  }
-
-### Visit # logic
+  dimension: visitorId {label: "Visitor ID"}
 
   dimension: visitnumber {
-    group_label: "Visit Number"
     label: "Visit Number"
     type: number
     description: "The session number for this user. If this is the first session, then this is set to 1."
   }
 
   dimension:  first_time_visitor {
-    group_label: "Visit Number"
     type: yesno
     sql: ${visitnumber} = 1 ;;
   }
 
-  dimension:  usertype {
-    group_label: "Visit Number"
-    label: "User Type"
-    type: string
-    sql: case when ${visitnumber} = 1 then 'New Visitor' else 'Returning Visitor' end ;;
-  }
-
   dimension: visitnumbertier {
-    group_label: "Visit Number"
     label: "Visit Number Tier"
     type: tier
     tiers: [1,2,5,10,15,20,50,100]
     style: integer
     sql: ${visitnumber} ;;
   }
+  dimension: visitId {label: "Visit ID"}
+  dimension: fullVisitorId {label: "Full Visitor ID"}
+
+  dimension: visitStartSeconds {
+    label: "Visit Start Seconds"
+    type: date_time
+    sql: TIMESTAMP_SECONDS(${TABLE}.visitStarttime) ;;
+    hidden: yes
+  }
+
+  ## referencing partition_date for demo purposes only. Switch this dimension to reference visistStartSeconds
+  dimension_group: visitStart {
+    timeframes: [date,day_of_week,fiscal_quarter,week,month,year,month_name,month_num,week_of_year]
+    label: "Visit Start"
+    type: time
+    sql: (TIMESTAMP(${visitStartSeconds})) ;;
+  }
+  ## use visit or hit start time instead
+  dimension: date {
+    hidden: yes
+  }
+  dimension: socialEngagementType {label: "Social Engagement Type"}
+  dimension: userid {label: "User ID"}
+
+  measure: session_count {
+    type: count
+    filters: {
+      field: hits.isInteraction
+      value: "yes"
+    }
+    drill_fields: [fullVisitorId, visitnumber, session_count, totals.transactions_count, totals.transactionRevenue_total]
+  }
+  measure: unique_visitors {
+    type: count_distinct
+    sql: ${fullVisitorId} ;;
+    drill_fields: [fullVisitorId, visitnumber, session_count, totals.hits, totals.page_views, totals.timeonsite]
+  }
+
+  measure: average_sessions_ver_visitor {
+    type: number
+    sql: 1.0 * (${session_count}/NULLIF(${unique_visitors},0))  ;;
+    value_format_name: decimal_2
+    drill_fields: [fullVisitorId, visitnumber, session_count, totals.hits, totals.page_views, totals.timeonsite]
+  }
 
   measure: total_visitors {
-    group_label: "Z"
     type: count
     drill_fields: [fullVisitorId, visitnumber, session_count, totals.hits, totals.page_views, totals.timeonsite]
   }
 
   measure: first_time_visitors {
-    group_label: "Visit Number"
     label: "First Time Visitors"
     type: count
     filters: {
@@ -104,7 +206,6 @@ view: ga_sessions_base {
   }
 
   measure: second_time_visitors {
-    group_label: "Visit Number"
     label: "Second Time Visitors"
     type: count
     filters: {
@@ -113,8 +214,8 @@ view: ga_sessions_base {
     }
   }
 
+
   measure: returning_visitors {
-    group_label: "Visit Number"
     label: "Returning Visitors"
     type: count
     filters: {
@@ -123,33 +224,7 @@ view: ga_sessions_base {
     }
   }
 
-## Sesssions per Visitor
-
-  measure: session_count {
-    group_label: "Sessions"
-    type: count
-#     filters: {
-#       field: hits.isInteraction
-#       value: "yes"
-#     }
-    drill_fields: [fullVisitorId, visitnumber, session_count, totals.transactions_count, totals.transactionRevenue_total]
-  }
-
-  measure: unique_visitors {
-    group_label: "Visitors"
-    type: count_distinct
-    sql: ${fullVisitorId} ;;
-
-    drill_fields: [fullVisitorId, visitnumber, session_count, totals.hits, totals.page_views, totals.timeonsite]
-  }
-
-  measure: average_sessions_ver_visitor {
-    group_label: "Sessions"
-    type: number
-    sql: 1.0 * (${session_count}/NULLIF(${unique_visitors},0))  ;;
-    value_format_name: decimal_2
-    drill_fields: [fullVisitorId, visitnumber, session_count, totals.hits, totals.page_views, totals.timeonsite]
-  }
+  dimension: channelGrouping {label: "Channel Grouping"}
 
   # subrecords
   dimension: geoNetwork {hidden: yes}
@@ -160,104 +235,48 @@ view: ga_sessions_base {
   dimension: hits {hidden:yes}
   dimension: hits_eventInfo {hidden:yes}
 
-## Additional logic
-#   dimension: hour_of_day {
-#     type: number
-#     sql:
-#        round(
-#       case
-#         when substr(cast(round(rand() * 100,0) as string),2,1) in ('2','4','6','8','0')  then 7.5 + (rand())*16.5
-#         else  16.5 - (rand())*15.5
-#       end ,0)
-#         ;;
-#   }
-
-## use visit or hit start time instead
-  dimension: date {
-    hidden: yes
-  }
-
-  dimension: id {
-    group_label: "ID"
-    primary_key: yes
-    sql: CONCAT(CAST(${fullVisitorId} AS STRING), '|', COALESCE(CAST(${visitId} AS STRING),''), CAST(PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_TABLE_SUFFIX,r'^\d\d\d\d\d\d\d\d'))   AS STRING)) ;;
-  }
-
-## ASW - remove these dimensions
-  # dimension: visitStartSeconds {
-  #   label: "Visit Start Seconds"
-  #   type: date_time
-  #   sql: TIMESTAMP_SECONDS(${TABLE}.visitStarttime) ;;
-  #   hidden: yes
-  # }
-
-  # ## referencing partition_date for demo purposes only. Switch this dimension to reference visistStartSeconds
-  # dimension_group: visitStart {
-  #   timeframes: [date,day_of_week,fiscal_quarter,week,month,year,month_name,month_num,week_of_year, hour12]
-  #   label: "Visit Start"
-  #   type: time
-  #   sql: (TIMESTAMP(${visitStartSeconds})) ;;
-  # }
-
 }
 
 
 view: geoNetwork_base {
   extension: required
   dimension: continent {
-    label: "1 - Continent"
-    drill_fields: [subcontinent,country,region,metro,city]
+    drill_fields: [subcontinent,country,region,city,metro,approximate_networkLocation,networkLocation]
   }
   dimension: subcontinent {
-    label: "2 - Subcontinent"
-    drill_fields: [country,region,metro,city]
+    drill_fields: [country,region,city,metro,approximate_networkLocation,networkLocation]
+
   }
   dimension: country {
-    label: "3 - Country"
     map_layer_name: countries
-    drill_fields: [region,metro,city]
+    drill_fields: [region,metro,city,approximate_networkLocation,networkLocation]
   }
   dimension: region {
-    label: "4 - Region"
-    description: "e.g. US State"
-    map_layer_name: us_states
-    drill_fields: [metro,city]
+    drill_fields: [metro,city,approximate_networkLocation,networkLocation]
   }
   dimension: metro {
-    label: "5 - Metro"
-    description: "e.g. Metro Area"
-    drill_fields: [city]
+    drill_fields: [city,approximate_networkLocation,networkLocation]
   }
-  dimension: city {
-    label: "6 - City"
-    drill_fields: [metro,approximate_networkLocation,networkLocation]
-  }
-  dimension: cityid {group_label: "Z" label: "City ID"}
-  dimension: networkDomain {description: "e.g. comcast.net, vern.hr" label: "Network Domain"}
+  dimension: city {drill_fields: [metro,approximate_networkLocation,networkLocation]}
+  dimension: cityid { label: "City ID"}
+  dimension: networkDomain {label: "Network Domain"}
   dimension: latitude {
-    group_label: "Z"
     type: number
     hidden: yes
     sql: CAST(${TABLE}.latitude as FLOAT64);;
   }
   dimension: longitude {
-    group_label: "Z"
     type: number
     hidden: yes
     sql: CAST(${TABLE}.longitude as FLOAT64);;
   }
-  dimension: networkLocation {
-    group_label: "Z"
-    label: "Network Location"
-  }
+  dimension: networkLocation {label: "Network Location"}
   dimension: location {
-    group_label: "Z"
     type: location
     sql_latitude: ${latitude} ;;
     sql_longitude: ${longitude} ;;
   }
   dimension: approximate_networkLocation {
-    group_label: "Z"
     type: location
     sql_latitude: ROUND(${latitude},1) ;;
     sql_longitude: ROUND(${longitude},1) ;;
@@ -274,41 +293,30 @@ view: totals_base {
     sql: ${ga_sessions.id} ;;
   }
   measure: visits_total {
-    group_label: "Visitors"
     type: sum
     sql: ${TABLE}.visits ;;
   }
   measure: hits_total {
-    group_label: "Hits"
     type: sum
     sql: ${TABLE}.hits ;;
     drill_fields: [hits.detail*]
   }
   measure: hits_average_per_session {
-    group_label: "Hits"
     type: number
     sql: 1.0 * ${hits_total} / NULLIF(${ga_sessions.session_count},0) ;;
     value_format_name: decimal_2
   }
   measure: pageviews_total {
-    group_label: "Page Views"
     label: "Page Views"
     type: sum
     sql: ${TABLE}.pageviews ;;
   }
   measure: timeonsite_total {
-    group_label: "Time on Site"
     label: "Time On Site"
     type: sum
     sql: ${TABLE}.timeonsite ;;
   }
-  dimension: timeonsite {
-    group_label: "Time on Screen"
-    label: "Time On Site"
-    type: number
-  }
   dimension: timeonsite_tier {
-    group_label: "Time on Screen"
     label: "Time On Site Tier"
     type: tier
     sql: ${TABLE}.timeonsite ;;
@@ -316,7 +324,6 @@ view: totals_base {
     style: integer
   }
   measure: timeonsite_average_per_session {
-    group_label: "Time on Site"
     label: "Time On Site Average Per Session"
     type: number
     sql: 1.0 * ${timeonsite_total} / NULLIF(${ga_sessions.session_count},0) ;;
@@ -324,7 +331,6 @@ view: totals_base {
   }
 
   measure: page_views_session {
-    group_label: "Page Views"
     label: "PageViews Per Session"
     type: number
     sql: 1.0 * ${pageviews_total} / NULLIF(${ga_sessions.session_count},0) ;;
@@ -332,23 +338,19 @@ view: totals_base {
   }
 
   measure: bounces_total {
-    group_label: "Bounces"
     type: sum
     sql: ${TABLE}.bounces ;;
   }
   measure: bounce_rate {
-    group_label: "Bounces"
     type:  number
     sql: 1.0 * ${bounces_total} / NULLIF(${ga_sessions.session_count},0) ;;
     value_format_name: percent_2
   }
   measure: transactions_count {
-    group_label: "Transactions"
     type: sum
     sql: ${TABLE}.transactions ;;
   }
   measure: transactionRevenue_total {
-    group_label: "Transactions"
     label: "Transaction Revenue Total"
     type: sum
     sql: (${TABLE}.transactionRevenue/1000000) ;;
@@ -356,31 +358,26 @@ view: totals_base {
     drill_fields: [transactions_count, transactionRevenue_total]
   }
   measure: newVisits_total {
-    group_label: "Visit Number"
     label: "New Visits Total"
     type: sum
     sql: ${TABLE}.newVisits ;;
   }
   measure: screenViews_total {
-    group_label: "Z"
     label: "Screen Views Total"
     type: sum
     sql: ${TABLE}.screenViews ;;
   }
   measure: timeOnScreen_total{
-    group_label: "Z"
     label: "Time On Screen Total"
     type: sum
     sql: ${TABLE}.timeOnScreen ;;
   }
   measure: uniqueScreenViews_total {
-    group_label: "Z"
     label: "Unique Screen Views Total"
     type: sum
     sql: ${TABLE}.uniqueScreenViews ;;
   }
   dimension: timeOnScreen_total_unique{
-    group_label: "Time on Screen"
     label: "Time On Screen Total"
     type: number
     sql: ${TABLE}.timeOnScreen ;;
@@ -391,38 +388,14 @@ view: totals_base {
 view: trafficSource_base {
   extension: required
 
-# dimension: adwords {}
-  dimension: referralPath {
-    description: "Path to referring someone: /a/google.com/forum/, /intl/ar/yt/about/, /analytics/web/, /mail/u/0/"
-    label: "Referral Path"
-    sql: substr(${TABLE}.referralPath,0,40) ;;
-  }
-  dimension: campaign {
-    description: "Campaign name - e.g.  AW - Accessories, AW - Dynamic Search Ads Whole Site, Data Share Promo"
-  }
-  dimension: source {
-    description: "Website that brought in traffic: quora.com, facebook.com, reddit.com, mail.google.com"
-    drill_fields: [hits_page.hostName]
-    suggest_persist_for: "24 hours"
-  }
-  dimension: medium {
-    description: "affiliate, cpc, cpm, organic, referral"
-    suggest_persist_for: "24 hours"
-  }
-  dimension: keyword {
-    description: "Ad keyword that drew someone to the site"
-  }
-  dimension: adContent {
-    description: "Ad name - e.g. Display Ad created 3/11/14, Full auto ad IMAGE ONLY"
-    label: "Ad Content"
-  }
-
-  dimension:  sourceMedium{
-    description: "source / medium concatination"
-    label: "source / medium"
-    sql: ${source} || '/' || ${medium} ;;
-  }
-
+  dimension: addContent {}
+#   dimension: adwords {}
+  dimension: referralPath {label: "Referral Path"}
+  dimension: campaign {}
+  dimension: source {}
+  dimension: medium {}
+  dimension: keyword {}
+  dimension: adContent {label: "Ad Content"}
   measure: source_list {
     type: list
     list_field: source
@@ -463,77 +436,55 @@ view: adwordsClickInfo_base {
 view: device_base {
   extension: required
 
-  dimension: browser {description: "Chrome, Safari, Firefox, Internet Explorer, Edge"}
-  dimension: browserVersion {group_label: "Z" label:"Browser Version"}
-  dimension: operatingSystem {
-    label: "Operating System"
-    description: "Android, BlackBerry, Chrome OS, iOS, Linux, Macintosh, Samsung, Windows"
-  }
-  dimension: operatingSystemVersion {group_label: "Z" label: "Operating System Version"}
+  dimension: browser {}
+  dimension: browserVersion {label:"Browser Version"}
+  dimension: operatingSystem {label: "Operating System"}
+  dimension: operatingSystemVersion {label: "Operating System Version"}
   dimension: deviceCategory { label:"Device Category" description:"mobile,tablet,desktop"}
   dimension: isMobile {type: yesno label: "Is Mobile" sql: ${deviceCategory} in ('mobile','tablet') ;; }
   dimension: isDesktop {type: yesno label: "Is Desktop" sql: ${deviceCategory} = 'desktop' ;; }
-  dimension: flashVersion {group_label: "Z" label: "Flash Version"}
+  dimension: flashVersion {label: "Flash Version"}
   dimension: javaEnabled {
     label: "Java Enabled"
     type: yesno
   }
-  dimension: language {group_label: "Z" }
-  dimension: screenColors {group_label: "Z" label: "Screen Colors"}
-  dimension: screenResolution {group_label: "Z" label: "Screen Resolution"}
-  dimension: mobileDeviceBranding {group_label: "Z" label: "Mobile Device Branding"}
-  dimension: mobileDeviceInfo {group_label: "Z" label: "Mobile Device Info"}
-  dimension: mobileDeviceMarketingName {group_label: "Z" label: "Mobile Device Marketing Name"}
-  dimension: mobileDeviceModel {group_label: "Z" label: "Mobile Device Model"}
-  dimension: mobileInputSelector {group_label: "Z" label: "Mobile Input Selector"}
+  dimension: language {}
+  dimension: screenColors {label: "Screen Colors"}
+  dimension: screenResolution {label: "Screen Resolution"}
+  dimension: mobileDeviceBranding {label: "Mobile Device Branding"}
+  dimension: mobileDeviceInfo {label: "Mobile Device Info"}
+  dimension: mobileDeviceMarketingName {label: "Mobile Device Marketing Name"}
+  dimension: mobileDeviceModel {label: "Mobile Device Model"}
+  dimension: mobileDeviceInputSelector {label: "Mobile Device Input Selector"}
 }
 
 view: hits_base {
   extension: required
   dimension: id {
-    group_label: "Z"
     primary_key: yes
     sql: CONCAT(${ga_sessions.id},'|',FORMAT('%05d',${hitNumber})) ;;
   }
-  dimension: product {}
-  dimension: hitNumber {
-    group_label: "Description"
-#     description: "test 2 description"
-#     view_label: "test"
-#     link: {
-#       label: "documentation"
-#       url: "www.google.com"
-#     }
-  }
-  dimension: time {
-    group_label: "Time"
-  }
+  dimension: hitNumber {}
+  dimension: time {}
   dimension_group: hit {
     timeframes: [date,day_of_week,fiscal_quarter,week,month,year,month_name,month_num,week_of_year]
     type: time
-    sql: TIMESTAMP_MILLIS(1000 * ${ga_sessions.visitStart_raw} + ${TABLE}.time)  ;;
+    sql: TIMESTAMP_MILLIS(${ga_sessions.visitStartSeconds}*1000 + ${TABLE}.time) ;;
   }
-  dimension: hour {group_label: "Time"}
-  dimension: minute {group_label: "Time"}
+  dimension: hour {}
+  dimension: minute {}
   dimension: isSecure {
-    group_label: "Description"
     label: "Is Secure"
     type: yesno
   }
   dimension: isInteraction {
-    group_label: "Description"
     label: "Is Interaction"
     type: yesno
     description: "If this hit was an interaction, this is set to true. If this was a non-interaction hit (i.e., an event with interaction set to false), this is false."
   }
-  dimension: referer {
-    group_label: "Description"
-    description: "Who referred user to the site (facebook.com, google.com)"
-    sql: substr(${TABLE}.referer,0,40) ;;
-  }
+  dimension: referer {}
 
   measure: count {
-    label: "Count Hits"
     type: count
     drill_fields: [hits.detail*]
   }
@@ -564,45 +515,21 @@ view: hits_base {
 view: hits_page_base {
   extension: required
   dimension: pagePath {
-    description: "Path (post-hostname URL) of page"
-    suggest_persist_for: "24 hours"
     label: "Page Path"
     link: {
       label: "Link"
       url: "{{ value }}"
     }
-    # link: {
-    #   label: "Page Info Dashboard"
-    #   url: "/dashboards/101?Page%20Path={{ value | encode_uri}}"
-    #   icon_url: "http://www.looker.com/favicon.ico"
-    # }
-  }
-
-# Note - 11.23 mid change below in adding the full page path so we can hyperlink out to the specific page
-
-
-  dimension: FullPagePath {
-    description: "Full Page Path"
-    suggest_persist_for: "24 hours"
-    label: "Full Page Path"
-    sql: ${hostName}||${pagePath} ;;
     link: {
-      label: "Link"
-      url: "https://{{ value }}"
+      label: "Page Info Dashboard"
+      url: "/dashboards/101?Page%20Path={{ value | encode_uri}}"
+      icon_url: "http://www.looker.com/favicon.ico"
     }
   }
-
-
-  dimension: hostName {
-    # description: "@{property1}.com, @{property2}.com, @{property3}.com, @{property4}.com, @{property5}.com, @{property6}.com"
-    label: "Host Name"
-    # sql: concat(${ga_sessions.property},'.com') ;;
-    drill_fields: [trafficSource_base.source]
-    suggest_persist_for: "24 hours"
-  }
-  dimension: pageTitle {description: "Title @ top of page" label: "Page Title"}
-  dimension: searchKeyword {group_label: "Z" label: "Search Keyword"}
-  dimension: searchCategory{group_label: "Z" label: "Search Category"}
+  dimension: hostName {label: "Host Name"}
+  dimension: pageTitle {label: "Page Title"}
+  dimension: searchKeyword {label: "Search Keyword"}
+  dimension: searchCategory{label: "Search Category"}
 }
 
 view: hits_transaction_base {
@@ -614,7 +541,7 @@ view: hits_transaction_base {
   }
   dimension: transactionShipping {label: "Transaction Shipping"}
   dimension: affiliation {}
-  dimension: currencyCode {label: "Currency Code"}
+  dimension: currencyCode {label: "Curency Code"}
   dimension: localTransactionRevenue {label: "Local Transaction Revenue"}
   dimension: localTransactionTax {label: "Local Transaction Tax"}
   dimension: localTransactionShipping {label: "Local Transaction Shipping"}
@@ -624,18 +551,16 @@ view: hits_item_base {
   extension: required
 
   dimension: id {
-    group_label: "ID"
     primary_key: yes
     sql: ${hits.id} ;;
   }
-  dimension: transactionId {group_label: "ID" label: "Transaction ID"}
+  dimension: transactionId {label: "Transaction ID"}
   dimension: productName {
-    group_label: "Z"
     label: "Product Name"
   }
 
-  dimension: productCategory {group_label: "Z" label: "Product Catetory"}
-  dimension: productSku {group_label: "Z" label: "Product Sku"}
+  dimension: productCategory {label: "Product Catetory"}
+  dimension: productSku {label: "Product Sku"}
 
   dimension: itemQuantity {
     description: "Should only be used as a dimension"
@@ -647,9 +572,8 @@ view: hits_item_base {
     label: "Item Revenue"
     hidden: yes
   }
-  dimension: currencyCode {label: "Currency Code"}
+  dimension: curencyCode {label: "Curency Code"}
   dimension: localItemRevenue {
-    group_label: "Z"
     label:"Local Item Revenue"
     description: "Should only be used as a dimension"
   }
@@ -661,33 +585,20 @@ view: hits_item_base {
   }
 }
 
-view: hits_product_base {
-  extension: required
-
-  dimension: productSKU {
-    # hidden: yes
-    primary_key: yes
-  }
-}
-
 view: hits_social_base {
   extension: required   ## THESE FIELDS WILL ONLY BE AVAILABLE IF VIEW "hits_social" IN GA CUSTOMIZE HAS THE "extends" parameter declared
 
-  dimension: socialInteractionNetwork {group_label: "Z" label: "Social Interaction Network"}
-  dimension: socialInteractionAction {group_label: "Z" label: "Social Interaction Action"}
-  dimension: socialInteractions {group_label: "Z" label: "Social Interactions"}
-  dimension: socialInteractionTarget {group_label: "Z" label: "Social Interaction Target"}
-  dimension: socialNetwork {
-    description: "Facebook, Google Groups, Google+, Pinterest, Quora, reddit, Twitter, VKontakte, YouTube"
-    label: "Social Network"
-  }
+  dimension: socialInteractionNetwork {label: "Social Interaction Network"}
+  dimension: socialInteractionAction {label: "Social Interaction Action"}
+  dimension: socialInteractions {label: "Social Interactions"}
+  dimension: socialInteractionTarget {label: "Social Interaction Target"}
+  dimension: socialNetwork {label: "Social Network"}
   dimension: uniqueSocialInteractions {
-    group_label: "Z"
     label: "Unique Social Interactions"
     type: number
   }
-  dimension: hasSocialSourceReferral {description: "Y/N on has a social referral" label: "Has Social Source Referral"}
-  dimension: socialInteractionNetworkAction {group_label: "Z" label: "Social Interaction Network Action"}
+  dimension: hasSocialSourceReferral {label: "Has Social Source Referral"}
+  dimension: socialInteractionNetworkAction {label: "Social Interaction Network Action"}
 }
 
 view: hits_publisher_base {
@@ -744,18 +655,18 @@ view: hits_publisher_base {
 view: hits_appInfo_base {
   extension: required
 
-  dimension: name {group_label: "Z"}
-  dimension: version {group_label: "Z"}
-  dimension: id {group_label: "Z"}
-  dimension: installerId {group_label: "Z"}
-  dimension: appInstallerId {group_label: "Z"}
-  dimension: appName {group_label: "Z"}
-  dimension: appVersion {group_label: "Z"}
-  dimension: appId {group_label: "Z"}
-  dimension: screenName {description: "URL on the screen @ time of hit"}
-  dimension: landingScreenName {description:"First URL (upon landing)"}
-  dimension: exitScreenName {description:"Last URL (upon exit)"}
-  dimension: screenDepth {group_label: "Z"}
+  dimension: name {}
+  dimension: version {}
+  dimension: id {}
+  dimension: installerId {}
+  dimension: appInstallerId {}
+  dimension: appName {}
+  dimension: appVersion {}
+  dimension: appId {}
+  dimension: screenName {}
+  dimension: landingScreenName {}
+  dimension: exitScreenName {}
+  dimension: screenDepth {}
 }
 
 view: contentInfo_base {
@@ -765,22 +676,22 @@ view: contentInfo_base {
 
 view: hits_customDimensions_base {
   extension: required
-  dimension: index {view_label: "Z" group_label: "Z" type:number}
-  dimension: value {view_label: "Z" group_label: "Z" }
+  dimension: index {type:number}
+  dimension: value {}
 }
 
 view: hits_customMetrics_base {
   extension: required
 
-  dimension: index {view_label: "Z" group_label: "Z" type:number}
-  dimension: value {view_label: "Z" group_label: "Z" }
+  dimension: index {type:number}
+  dimension: value {}
 }
 
 view: hits_customVariables_base {
   extension: required
-  dimension: customVarName {view_label: "Z" group_label: "Z"}
-  dimension: customVarValue {view_label: "Z" group_label: "Z"}
-  dimension: index {view_label: "Z" group_label: "Z" type:number}
+  dimension: customVarName {}
+  dimension: customVarValue {}
+  dimension: index {type:number}
 }
 
 view: hits_eCommerceAction_base {
@@ -792,11 +703,11 @@ view: hits_eCommerceAction_base {
 
 view: hits_eventInfo_base {
   extension: required
-  dimension: eventCategory {group_label: "Z" description: "Removing this b/c already included in measures" label: "Event Category"  suggest_persist_for: "24 hours"}
+  dimension: eventCategory {label: "Event Category"}
 
-  dimension: eventAction {group_label: "Z" description: "Removing this b/c already included in measures" label: "Event Action"     suggest_persist_for: "24 hours"}
-  dimension: eventLabel {group_label: "Label on site that prompted event / action" label: "Event Label"     suggest_persist_for: "24 hours"}
-  dimension: eventValue {group_label: "Z" label: "Event Value"}
+  dimension: eventAction {label: "Event Action"}
+  dimension: eventLabel {label: "Event Label"}
+  dimension: eventValue {label: "Event Value"}
 
 }
 

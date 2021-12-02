@@ -1,14 +1,4 @@
-#project_name: "audience_building_tool"
-
-# # Use local_dependency: To enable referencing of another project
-# # on this instance with include: statements
-#
-# local_dependency: {
-#   project: "name_of_other_project"
-# }
-
-
-
+project_name: "audience_building_tool"
 
 application: ga360_audience_selector {
   label: "GA360 Audience Builder"
@@ -18,7 +8,7 @@ application: ga360_audience_selector {
   entitlements: {
     local_storage: yes
     use_embeds: yes
-    external_api_urls: ["https://europe-west1-samsung-looker-emea.cloudfunctions.net/","https://localhost:8080","http://localhost:8080"]
-    #allow_same_origin: yes
+    external_api_urls: ["https://europe-west1-samsung-looker-emea.cloudfunctions.net","https://localhost:8080","http://localhost:8080","https://us-central1-jjt-consumerdatalake-bigquery.cloudfunctions.net"]
+    # allow_same_origin: yes (depreciated this entitlement in update 7.18 in favor of "use embeds" which you can see above)
   }
 }

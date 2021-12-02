@@ -1,7 +1,3 @@
-# view: audience_meta_data {
-#   sql_table_name: `jjt-consumerdatalake-bigquery.ga360_analytics.audience_list` ;;
-
-# updating view name below to match BQ table name
 view: audience_list {
   sql_table_name: `samsung-looker-emea.audience_activation_tool.audience_list` ;;
 
