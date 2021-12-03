@@ -449,8 +449,8 @@
     model: google_analytics_block
     explore: ga_sessions
     type: looker_pie
-    fields: [ga_sessions.unique_visitors, hits.hit_day_of_week]
-    fill_fields: [hits.hit_day_of_week]
+    fields: [ga_sessions.unique_visitors, ga_sessions.partition2_day_of_week]
+    fill_fields: [ga_sessions.partition2_day_of_week]
     filters:
       ga_sessions.partition_date: 2017-07-26  to  2017-08-03
     sorts: [ga_sessions.unique_visitors desc]
